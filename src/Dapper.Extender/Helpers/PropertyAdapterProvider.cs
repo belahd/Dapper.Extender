@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace Dapper.Extender.Helpers
 {
     public class PropertyAdapterProvider<TThis>
     {
-        private static readonly Dictionary<string, IPropertyAdapter<TThis>> _instances = new Dictionary<string, IPropertyAdapter<TThis>>();
+        private static readonly Dictionary<string, IPropertyAdapter<TThis>> instances = new Dictionary<string, IPropertyAdapter<TThis>>();
 
-        public static IPropertyAdapter<TThis> GetInstance(string forPropertyName)
+        public static IPropertyAdapter<TThis> GetInstance(string propertyName)
         {
-            if (!_instances.TryGetValue(forPropertyName, out IPropertyAdapter<TThis> instance))
+            if (!instances.TryGetValue(propertyName, out IPropertyAdapter<TThis> instance))
             {
-                var property = typeof(TThis).GetProperty(forPropertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var property = typeof(TThis).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
                 MethodInfo getMethod;
                 Delegate getterInvocation = null;
@@ -33,7 +32,7 @@ namespace Dapper.Extender.Helpers
                 var concreteAdapterType = openAdapterType.MakeGenericType(typeof(TThis), property.PropertyType);
                 instance = Activator.CreateInstance(concreteAdapterType, getterInvocation) as IPropertyAdapter<TThis>;
 
-                _instances.Add(forPropertyName, instance);
+                instances.Add(propertyName, instance);
             }
 
             return instance;

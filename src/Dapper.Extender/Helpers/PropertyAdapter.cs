@@ -1,10 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dapper.Extender.Helpers
 {
-    class PropertyAdapter
+    public class PropertyAdapter<TThis, TResult> : IPropertyAdapter<TThis>
     {
+        private readonly Func<TThis, TResult> getter;
+
+        public PropertyAdapter(Func<TThis, TResult> getterInvocation)
+        {
+            getter = getterInvocation;
+        }
+
+        public object InvokeGet(TThis @this)
+        {
+            return getter.Invoke(@this);
+        }
     }
 }
